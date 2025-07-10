@@ -1,204 +1,135 @@
-### Install drivers in the Ubuntu system
-https://github.com/lcdwiki/LCD-show-ubuntu
+# MHS35 3.5" TFT LCD Driver for Raspberry Pi 5 (Kali Linux)
 
-### Install drivers in the Kali system
-https://github.com/lcdwiki/LCD-show-kali
+This repository contains an installation script for enabling the **MHS35 3.5" SPI TFT touchscreen display** on the **Raspberry Pi 5** running **Kali Linux ARM64**.
 
-### Install drivers in the RetroPie system
-https://github.com/lcdwiki/LCD-show-retropie
+> 🛠️ Forked from [GoodTFT's LCD-show](https://github.com/goodtft/LCD-show)  
+> 💻 Customized by [@at0m-b0mb](https://github.com/at0m-b0mb) for full compatibility with Kali Linux and Raspberry Pi 5  
+> 📦 Includes framebuffer mirroring (`fbcp`), calibration, and optional rotation support
 
+---
 
+## 🚀 Features
 
-Install drivers in the Raspbian system<br>
-====================================================
-Update: <br>
-  v2.1-20191106<br>
-  Update to support MHS35B<br>
-Update: <br>
-  v2.0-20190704<br>
-  Update to support rotate the display direction<br>
-Update: <br>
-  v1.9-20181204<br>
-  Update to support MHS40 & MHS32<br>
-Update: <br>
-  v1.8-20180907<br>
-  Update to support MHS35<br>
-Update: <br>
-  v1.7-20180320<br>
-  Update to support Raspbian Version: March 2018(Release date:2018-03-13)<br>
-Update: <br>
-  v1.6-20170824<br>
-  Update xserver to support Raspbian-2017-08-16<br>
-Update: <br>
-  v1.5-20170706<br>
-  Update to support Raspbian-2017-07-05, Raspbian-2017-06-21<br>
-Update: <br>
-  v1.3-20170612<br>
-  fixed to support Raspbian-2017-03-02, Raspbian-2017-04-10<br>
-Update: <br>
-  v1.2-20170302<br>
-  Add xserver-xorg-input-evdev_1%3a2.10.3-1_armhf.deb to support Raspbian-2017-03-02<br>
-Update: <br>
-  v1.1-20160815<br><br>
+- ✅ Tested on **Kali Linux ARM64** (2025)
+- ✅ Fully supports **Raspberry Pi 5** (SPI + HDMI)
+- ✅ Installs required drivers and device overlays
+- ✅ Enables touch and display output via SPI
+- ✅ Optional framebuffer mirroring via `fbcp`
+- ⚠️ Rotation is **not fully functional yet** on some setups — work in progress
 
+---
 
-# How to install the LCD driver of Raspberry Pi
-  
-1.)Step1, Install Raspbian official mirror <br>
-====================================================
-  a)Download Raspbian official mirror:<br>
-  https://www.raspberrypi.org/downloads/<br>
-  b)Use“SDFormatter.exe”to Format your TF Card<br>
-  c)Use“Win32DiskImager.exe” Burning mirror to TF Card<br>
-     
-2.) Step2, Clone my repo onto your pi<br>
-====================================================
-Use SSH to connect the Raspberry Pi, <br>
-And Ensure that the Raspberry Pi is connected to the Internet before executing the following commands:
------------------------------------------------------------------------------------------------------
+## 📦 Requirements
 
-```sudo rm -rf LCD-show```<br>
-```git clone https://github.com/goodtft/LCD-show.git```<br>
-```chmod -R 755 LCD-show```<br>
-```cd LCD-show/```<br>
-  
-3.)Step3, According to your LCD's type, excute the corresponding driver:
-====================================================
+- Raspberry Pi 5
+- Kali Linux (ARM64) from [official source](https://www.kali.org/get-kali/#kali-arm)
+- MHS35 3.5” SPI TFT LCD Display
+- Internet connection for dependency installation
 
-# 2.4” RPi Display (MPI2401):
-### Driver install:
-sudo ./LCD24-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/2.4inch_RPi_Display  <br>
-EN: http://www.lcdwiki.com/2.4inch_RPi_Display
- 
+---
 
-# 2.4” RPi Display For RPi 3A+ (MPI2411):
-### Driver install:
-sudo ./LCD24-3A+-show  
-### WIKI:
-CN: http://www.lcdwiki.com/zh/2.4inch_RPi_Display_For_RPi_3A+   <br>
-EN: http://www.lcdwiki.com/2.4inch_RPi_Display_For_RPi_3A+
+## 📁 Repository Structure
 
-# 2.8” RPi Display (MPI2801):
-### Driver install:
-sudo ./LCD28-show 
-### WIKI:
-CN: http://www.lcdwiki.com/zh/2.8inch_RPi_Display  <br>
-EN: http://www.lcdwiki.com/2.8inch_RPi_Display
-  
-# 3.2” RPi Display (MPI3201):
-### Driver install:
-sudo ./LCD32-show   
-### WIKI:
-CN: http://www.lcdwiki.com/zh/3.2inch_RPi_Display  <br>
-EN: http://www.lcdwiki.com/3.2inch_RPi_Display
+| File / Folder | Purpose |
+|---------------|---------|
+| `MHS35-PI5-show.sh` | 🔧 Main installation script |
+| `rotate.sh` | ↪️ Optional screen rotation logic |
+| `usr/`, `boot/`, `etc/` | 📂 Drivers and config files (from GoodTFT repo) |
+| `system_backup.sh` | 🛡️ Optional: Backup current system files |
+| `system_config.sh` | 📊 Detects OS version (Debian-based check) |
 
-# MHS-3.2” RPi Display (MHS3232):
-### Driver install:
-sudo ./MHS32-show   
-### WIKI:
-CN: http://www.lcdwiki.com/zh/MHS-3.2inch_Display  <br>
-EN: http://www.lcdwiki.com/MHS-3.2inch_Display
+---
 
-# 3.5” RPi Display(MPI3501):
-### Driver install:
-sudo ./LCD35-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/3.5inch_RPi_Display  <br>
-EN: http://www.lcdwiki.com/3.5inch_RPi_Display
-   
-# 3.5” HDMI Display-B(MPI3508):
-### Driver install:
-sudo ./MPI3508-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/3.5inch_HDMI_Display-B  <br>
-EN: http://www.lcdwiki.com/3.5inch_HDMI_Display-B
-    
-# MHS-3.5” RPi Display(MHS3528):
-### Driver install:
-sudo ./MHS35-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/MHS-3.5inch_RPi_Display  <br>
-EN:http://www.lcdwiki.com/MHS-3.5inch_RPi_Display
+## 🧪 Tested On
 
-# MHS-3.5” RPi Display-B(MHS35XX):
-### Driver install:
-sudo ./MHS35B-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/MHS-3.5inch_RPi_Display-B  <br>
-EN:http://www.lcdwiki.com/MHS-3.5inch_RPi_Display-B
+- Raspberry Pi 5 (8GB model)
+- Kali Linux 2025.2 ARM64 (XFCE)
+- MHS35 SPI TFT LCD from LCDWiki
+- HDMI to SPI framebuffer mirroring with `fbcp`
 
-# 4.0" HDMI Display(MPI4008):
-### Driver install:
-sudo ./MPI4008-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/4inch_HDMI_Display-C  <br>
-EN: http://www.lcdwiki.com/4inch_HDMI_Display-C
-   
-# MHS-4.0" HDMI Display-B(MHS4001):
-### Driver install:
-sudo ./MHS40-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/MHS-4.0inch_Display-B  <br>
-EN: http://www.lcdwiki.com/MHS-4.0inch_Display-B
-  
-# 5.0” HDMI Display(Resistance touch)(MPI5008):
-### Driver install:
-sudo ./LCD5-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/5inch_HDMI_Display  <br>
-EN: http://www.lcdwiki.com/5inch_HDMI_Display
-    
-# 5inch HDMI Display-B(Capacitor touch)(MPI5001):
-### Driver install:
-sudo ./MPI5001-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/5inch_HDMI_Display-B  <br>
-EN: http://www.lcdwiki.com/5inch_HDMI_Display-B
-    
-# 7inch HDMI Display-B-800X480(MPI7001):
-### Driver install:
-sudo ./LCD7B-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/7inch_HDMI_Display-B  <br>
-EN: http://www.lcdwiki.com/7inch_HDMI_Display-B
-   
-# 7inch HDMI Display-C-1024X600(MPI7002):
-### Driver install:
-sudo ./LCD7C-show
-### WIKI:
-CN: http://www.lcdwiki.com/zh/7inch_HDMI_Display-C  <br>
-EN: http://www.lcdwiki.com/7inch_HDMI_Display-C
-   
-Wait for a moment after executing the above command, then you can use the corresponding raspberry LCD.
+---
 
+## ⚙️ Installation Instructions
 
+### 🔹 1. Clone the Repository
 
+```bash
+sudo rm -rf LCD-show-kali
+git clone https://github.com/at0m-b0mb/LCD-show-kali.git
+chmod -R 775 LCD-show-kali
+cd LCD-show-kali
+```
 
-# How to rotate the display direction
+---
 
-This method only applies to the Raspberry Pi series of display screens, other display screens do not apply.
+### 🔹 2. Run the Installer
 
-### Method 1, If the driver is not installed, execute the following command (Raspberry Pi needs to connected to the Internet):
+```bash
+sudo ./MHS35-PI5-show.sh
+```
 
-sudo rm -rf LCD-show<br>
-git clone https://github.com/goodtft/LCD-show.git<br>
-chmod -R 755 LCD-show<br>
-cd LCD-show/<br>
-sudo ./XXX-show 90<br>
+You can replace `90` with:
+- `0` → Normal (no rotation)
+- `90` → Portrait
+- `180` → Inverted
+- `270` → Portrait (other side)
 
-After execution, the driver will be installed. The system will automatically restart, and the display screen will rotate 90 degrees to display and touch normally.<br>
-( ' XXX-show ' can be changed to the corresponding driver, and ' 90 ' can be changed to 0, 90, 180 and 270, respectively representing rotation angles of 0 degrees, 90 degrees, 180 degrees, 270 degrees)<br>
+> ⚠️ Note: Rotation may not work on all Kali Linux images due to X11/input driver quirks. Actively being improved.
 
-### Method 2, If the driver is already installed, execute the following command:
+---
 
-cd LCD-show/<br>
-sudo ./rotate.sh 90<br>
+## 🔄 To Switch Back to HDMI Output (Disable LCD)
 
-After execution, the system will automatically restart, and the display screen will rotate 90 degrees to display and touch normally.<br>
-( ' 90 ' can be changed to 0, 90, 180 and 270, respectively representing rotation angles of 0 degrees, 90 degrees, 180 degrees, 270 degrees)<br>
-(If the rotate.sh prompt cannot be found, use Method 1 to install the latest drivers)
+```bash
+sudo ./LCD-hdmi
+```
 
+---
 
+## 🛠️ Dependencies Installed
 
+The script automatically installs:
+
+- `cmake`
+- `git`
+- `build-essential`
+- `xserver-xorg-input-evdev`
+- `libraspberrypi-dev`
+
+---
+
+## 💡 Troubleshooting
+
+### 1. Display Stuck or Blank?
+- Check `/boot/firmware/config.txt`
+- Verify SPI is enabled
+- Ensure correct overlay: `dtoverlay=mhs35:rotate=90`
+
+### 2. Touch Input Not Working?
+- Confirm `/etc/X11/xorg.conf.d/99-calibration.conf` is in place
+- Install: `xserver-xorg-input-evdev`
+- Try `fbcp` restart: `sudo fbcp &`
+
+### 3. Rotation Not Working?
+- Try rotating using Xinput or `xrandr`
+- Check if you're using X11 (not Wayland)
+- Manual touch config may be needed
+
+---
+
+## ❤️ Credits
+
+- Based on the original driver from [GoodTFT](https://github.com/goodtft/LCD-show)
+- Adapted for Kali Linux + Pi 5 by [@at0m-b0mb](https://github.com/at0m-b0mb)
+
+---
+
+## 📜 License
+
+MIT License — Free to use, modify, and distribute.
+
+---
+
+## 🙋‍♂️ Need Help?
+
+Open an [Issue](https://github.com/at0m-b0mb/LCD-show-kali/issues) or ping [@at0m-b0mb](https://github.com/at0m-b0mb)
