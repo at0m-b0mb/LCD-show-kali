@@ -59,10 +59,10 @@ fi
 if command -v cmake > /dev/null; then
     sudo apt-get install -y cmake libraspberrypi-dev
     git clone https://github.com/tasanakorn/rpi-fbcp || cp -r ./usr/rpi-fbcp .
-    mkdir -p rpi-fbcp/build && cd rpi-fbcp/build
+    mkdir -p rpi-fbcp/build && cd rpi-fbcp/build || exit 1
     cmake .. && make
     sudo install fbcp /usr/local/bin/fbcp
-    cd -
+    cd - > /dev/null || exit 1
     sudo cp ./etc/rc.local /etc/rc.local
 fi
 
@@ -95,14 +95,14 @@ fi
 
 # Rotate if argument passed
 if [ $# -eq 1 ]; then
-    sudo ./rotate.sh $1
+    sudo ./rotate.sh "$1"
 elif [ $# -gt 1 ]; then
     echo "Too many parameters"
 fi
 
 # Restart The System
 echo "[*] Driver installation complete. Reboot is required."
-read -p "Reboot now? [Y/n]: " REBOOT
+read -r -p "Reboot now? [Y/n]: " REBOOT
 if [[ $REBOOT =~ ^[Yy]|""$ ]]; then
   echo "[*] Rebooting..."
   sudo reboot
