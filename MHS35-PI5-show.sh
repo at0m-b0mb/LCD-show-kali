@@ -87,7 +87,8 @@ elif systemctl list-unit-files | grep -q "gdm.service"; then
     echo "[*] Enabling GDM display manager..."
     sudo systemctl enable gdm.service
 else
-    echo "[!] Warning: No display manager detected. Installing LightDM..."
+    echo "[!] Warning: No display manager detected. Attempting to install LightDM..."
+    echo "[!] This requires an internet connection. Installation may fail if offline."
     sudo apt-get install -y lightdm
     sudo systemctl enable lightdm.service
 fi
