@@ -100,17 +100,29 @@ The script automatically installs:
 
 ## 💡 Troubleshooting
 
-### 1. Display Stuck or Blank?
+### 1. Only Terminal Login Shows (No Desktop GUI)?
+**Solution:** The installer now automatically fixes this by:
+- Setting systemd to boot into graphical mode (`graphical.target`)
+- Enabling the display manager (LightDM/GDM3)
+
+If you installed before this fix, run:
+```bash
+sudo systemctl set-default graphical.target
+sudo systemctl enable lightdm.service  # or gdm3.service
+sudo reboot
+```
+
+### 2. Display Stuck or Blank?
 - Check `/boot/firmware/config.txt`
 - Verify SPI is enabled
 - Ensure correct overlay: `dtoverlay=mhs35:rotate=90`
 
-### 2. Touch Input Not Working?
+### 3. Touch Input Not Working?
 - Confirm `/etc/X11/xorg.conf.d/99-calibration.conf` is in place
 - Install: `xserver-xorg-input-evdev`
 - Try `fbcp` restart: `sudo fbcp &`
 
-### 3. Rotation Not Working?
+### 4. Rotation Not Working?
 - Try rotating using Xinput or `xrandr`
 - Check if you're using X11 (not Wayland)
 - Manual touch config may be needed
