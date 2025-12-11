@@ -1,8 +1,22 @@
 #!/bin/bash
 set -e
 
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then
+  echo "ERROR: This script must be run as root"
+  echo "Usage: sudo $0"
+  exit 1
+fi
+
 BOOTCFG="/boot/firmware/config.txt"
 OVERLAY_DIR="/boot/firmware/overlays"
+
+# Verify required files exist
+if [ ! -f "./usr/mhs35-overlay.dtb" ]; then
+  echo "ERROR: Missing ./usr/mhs35-overlay.dtb"
+  echo "Please run this script from the LCD-show-kali directory"
+  exit 1
+fi
 
 # Backup Boot Config
 cp "$BOOTCFG" "${BOOTCFG}.bak.$(date +%F-%H%M)"
