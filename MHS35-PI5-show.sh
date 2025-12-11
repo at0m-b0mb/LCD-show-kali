@@ -1,84 +1,129 @@
 #!/bin/bash
+set -e
 
-# Update repo and install required tools
-sudo apt update
-sudo apt install -y git cmake build-essential xserver-xorg-input-evdev libraspberrypi-dev
+echo "=============================================="
+echo "   MHS35 TFT Installer for Kali Linux Pi 5"
+echo "=============================================="
 
-# Backup current system files if needed
-sudo ./system_backup.sh
+BOOTCFG="/boot/firmware/config.txt"
+OVERLAY_DIR="/boot/firmware/overlays"
 
-# Remove conflicting input config
-sudo rm -f /etc/X11/xorg.conf.d/40-libinput.conf
-
-# Ensure X11 config directory exists
-sudo mkdir -p /etc/X11/xorg.conf.d
-
-# Copy overlay files for the LCD
-sudo cp ./usr/mhs35-overlay.dtb /boot/firmware/overlays/
-sudo cp ./usr/mhs35-overlay.dtb /boot/firmware/overlays/mhs35.dtbo
-
-# Patch config.txt
-CONFIG_FILE="/boot/firmware/config.txt"
-CONFIG_BAK="./boot/config.txt.bak"
-
-cp $CONFIG_FILE $CONFIG_BAK
-
-{
-echo "hdmi_force_hotplug=1"
-echo "dtparam=i2c_arm=on"
-echo "dtparam=spi=on"
-echo "enable_uart=1"
-echo "dtoverlay=mhs35:rotate=90"
-echo "hdmi_group=2"
-echo "hdmi_mode=1"
-echo "hdmi_mode=87"
-echo "hdmi_cvt 480 320 60 6 0 0 0"
-echo "hdmi_drive=2"
-} >> $CONFIG_BAK
-
-sudo cp -f $CONFIG_BAK $CONFIG_FILE
-
-# Copy calibration and optional config files
-sudo cp ./usr/99-calibration.conf-mhs35-90 /etc/X11/xorg.conf.d/99-calibration.conf
-
-# If older Debian (< 12.1), add fbturbo config
-source ./system_config.sh
-if [[ "$deb_version" < "12.1" ]]; then
-    sudo cp ./usr/99-fbturbo.conf /usr/share/X11/xorg.conf.d/
+# ----------------------------
+# 1. Safety Checks
+# ----------------------------
+if [ "$EUID" -ne 0 ]; then
+  echo "❌ Please run as root:"
+  echo "   sudo ./MHS35-PI5-show.sh"
+  exit 1
 fi
 
-# Optional: Install evdev driver
-if ! dpkg -l | grep -q xserver-xorg-input-evdev; then
-    sudo apt-get install -y xserver-xorg-input-evdev
-    sudo cp /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf
+if ! grep -q "Raspberry Pi 5" /proc/device-tree/model 2>/dev/null; then
+  echo "⚠️ Warning: This script is optimized for Raspberry Pi 5"
 fi
 
-# Optional: Install FBCP (Framebuffer Copy for HDMI to TFT)
-if command -v cmake > /dev/null; then
-    sudo apt-get install -y cmake libraspberrypi-dev
-    git clone https://github.com/tasanakorn/rpi-fbcp || cp -r ./usr/rpi-fbcp .
-    mkdir -p rpi-fbcp/build && cd rpi-fbcp/build
-    cmake .. && make
-    sudo install fbcp /usr/local/bin/fbcp
-    cd -
-    sudo cp ./etc/rc.local /etc/rc.local
+# ----------------------------
+# 2. Backup Boot Config
+# ----------------------------
+echo "[+] Backing up config.txt..."
+cp "$BOOTCFG" "${BOOTCFG}.bak.$(date +%F-%H%M)"
+
+# ----------------------------
+# 3. Enable SPI, I2C, UART
+# ----------------------------
+echo "[+] Enabling SPI, I2C, UART..."
+
+sed -i '/^dtparam=spi=/d' "$BOOTCFG"
+sed -i '/^dtparam=i2c_arm=/d' "$BOOTCFG"
+sed -i '/^enable_uart=/d' "$BOOTCFG"
+
+echo "dtparam=spi=on"       >> "$BOOTCFG"
+echo "dtparam=i2c_arm=on"  >> "$BOOTCFG"
+echo "enable_uart=1"      >> "$BOOTCFG"
+
+# ----------------------------
+# 4. Install Overlay
+# ----------------------------
+if [ ! -f "./usr/mhs35-overlay.dtb" ]; then
+  echo "❌ ERROR: Missing ./usr/mhs35-overlay.dtb"
+  echo "Place this script inside the LCD-show folder."
+  exit 1
 fi
 
-sudo sync && sleep 1
+echo "[+] Installing MHS35 overlay..."
+cp ./usr/mhs35-overlay.dtb "$OVERLAY_DIR/mhs35.dtbo"
 
-# Rotate if argument passed
-if [ $# -eq 1 ]; then
-    sudo ./rotate.sh $1
-elif [ $# -gt 1 ]; then
-    echo "Too many parameters"
-fi
+sed -i '/dtoverlay=mhs35/d' "$BOOTCFG"
+echo "dtoverlay=mhs35,rotate=90" >> "$BOOTCFG"
 
-# Restart The System
-echo "[*] Driver installation complete. Reboot is required."
-read -p "Reboot now? [Y/n]: " REBOOT
-if [[ $REBOOT =~ ^[Yy]|""$ ]]; then
-  echo "[*] Rebooting..."
-  sudo reboot
+# ----------------------------
+# 5. HDMI Safe Output
+# ----------------------------
+echo "[+] Forcing HDMI safe output..."
+sed -i '/hdmi_force_hotplug/d' "$BOOTCFG"
+echo "hdmi_force_hotplug=1" >> "$BOOTCFG"
+
+# ----------------------------
+# 6. Touch Calibration (X11)
+# ----------------------------
+echo "[+] Configuring touchscreen calibration..."
+
+mkdir -p /etc/X11/xorg.conf.d
+
+if [ -f "./usr/99-calibration.conf-mhs35-90" ]; then
+  cp ./usr/99-calibration.conf-mhs35-90 \
+     /etc/X11/xorg.conf.d/99-mhs35.conf
 else
-  echo "[*] Please reboot manually afterwards."
+  cat <<EOF > /etc/X11/xorg.conf.d/99-mhs35.conf
+Section "InputClass"
+    Identifier "MHS35 Touch Calibration"
+    MatchProduct "ADS7846 Touchscreen"
+    Option "Calibration" "3900 200 3900 200"
+    Option "SwapAxes" "1"
+EndSection
+EOF
 fi
+
+# ----------------------------
+# 7. Remove Legacy Pi OS Drivers
+# ----------------------------
+echo "[+] Removing legacy drivers..."
+
+rm -f /usr/share/X11/xorg.conf.d/99-fbturbo.conf
+rm -f /usr/share/X11/xorg.conf.d/99-fbturbo-fbcp.conf
+rm -f /usr/local/bin/fbcp
+rm -f /etc/rc.local
+
+# ----------------------------
+# 8. Install Touch Input Driver
+# ----------------------------
+echo "[+] Installing X11 touch drivers..."
+
+apt update
+apt install -y xserver-xorg-input-evdev xinput
+
+# ----------------------------
+# 9. Disable Wayland (Force X11)
+# ----------------------------
+echo "[+] Disabling Wayland for touch compatibility..."
+
+mkdir -p /etc/gdm3
+
+cat <<EOF > /etc/gdm3/custom.conf
+[daemon]
+WaylandEnable=false
+EOF
+
+# ----------------------------
+# 10. Sync & Reboot
+# ----------------------------
+sync
+sync
+sleep 2
+
+echo "=============================================="
+echo "✅ Installation Complete!"
+echo "✅ System will reboot in 5 seconds"
+echo "=============================================="
+
+sleep 5
+reboot
