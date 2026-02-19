@@ -22,7 +22,7 @@ if [ ! -d /etc/X11/xorg.conf.d ]; then
 sudo mkdir -p /etc/X11/xorg.conf.d
 fi
 sudo cp ./usr/tft7789-overlay.dtb "$OVERLAYS_PATH/"
-sudo cp ./usr/tft7789-overlay.dtb "$OVERLAYS_PATH/"tft7789.dtbo
+sudo cp ./usr/tft7789-overlay.dtb "$OVERLAYS_PATH/tft7789.dtbo"
 root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
 if test "$root_dev" = "/dev/mmcblk0p7";then
 sudo cp -rf ./boot/config-noobs-nomal.txt ./boot/config.txt.bak
@@ -44,7 +44,7 @@ sudo echo "dtoverlay=spi0-2cs,cs1_pin=4,0x01" >> ./boot/config.txt.bak
 sudo echo "gpio=18=op,dh" >> ./boot/config.txt.bak
 sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
-sudo cp ./usr/ft6236.dtb "$OVERLAYS_PATH/"ft6236.dtbo
+sudo cp ./usr/ft6236.dtb "$OVERLAYS_PATH/ft6236.dtbo"
 
 sudo cp -rf ./usr/99-calibration.conf-nano24-90  /etc/X11/xorg.conf.d/99-calibration.conf
 sudo cp -rf ./usr/99-fbturbo.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
@@ -93,7 +93,7 @@ else
 echo "install cmake error!!!!"
 fi
 else
-echo "bad network, can't install cmake!!!"
+echo "bad network, cannot install cmake!!!"
 fi
 
 #evdev install
@@ -120,7 +120,6 @@ echo "Package manager install failed, trying local package..."
 sudo dpkg -i -B ./xserver-xorg-input-evdev_1%3a2.10.6-1+b1_armhf.deb 2> error_output.txt
 result=`cat ./error_output.txt`
 fi
-result=`cat ./error_output.txt`
 echo -e "\033[31m$result\033[0m"
 grep -q "error:" ./error_output.txt && exit
 sudo cp -rf /usr/share/X11/xorg.conf.d/10-evdev.conf /usr/share/X11/xorg.conf.d/45-evdev.conf

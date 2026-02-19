@@ -23,8 +23,8 @@ sudo echo "hdmi_cvt 800 480 60 6 0 0 0" >> ./boot/config.txt.bak
 sudo echo "dtoverlay=goodix" >> ./boot/config.txt.bak
 sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
-if [ -f "$OVERLAYS_PATH/"goodix.dtbo ]; then
-sudo mv "$OVERLAYS_PATH/"goodix.dtbo "$OVERLAYS_PATH/"goodix.dtbo.bak
+if [ -f "$OVERLAYS_PATH/goodix.dtbo" ]; then
+sudo mv "$OVERLAYS_PATH/goodix.dtbo" "$OVERLAYS_PATH/goodix.dtbo.bak"
 sudo cp ./usr/goodix.dtbo "$OVERLAYS_PATH/" 
 fi
 

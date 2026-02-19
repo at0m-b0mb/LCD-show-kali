@@ -47,11 +47,7 @@ detect_boot_path() {
 # Detect overlays path
 detect_overlays_path() {
     BOOT_PATH=$(detect_boot_path)
-    if [ -d "$BOOT_PATH/overlays" ]; then
-        echo "$BOOT_PATH/overlays"
-    else
-        echo "$BOOT_PATH/overlays"
-    fi
+    echo "$BOOT_PATH/overlays"
 }
 
 # Get appropriate package manager repository

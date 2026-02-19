@@ -22,7 +22,7 @@ if [ ! -d /etc/X11/xorg.conf.d ]; then
 sudo mkdir -p /etc/X11/xorg.conf.d
 fi
 sudo cp ./usr/mhs35b-overlay.dtb "$OVERLAYS_PATH/"
-sudo cp ./usr/mhs35b-overlay.dtb "$OVERLAYS_PATH/"mhs35b.dtbo
+sudo cp ./usr/mhs35b-overlay.dtb "$OVERLAYS_PATH/mhs35b.dtbo"
 
 root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
 if test "$root_dev" = "/dev/mmcblk0p7";then
@@ -43,8 +43,8 @@ sudo echo "hdmi_cvt 480 320 60 6 0 0 0" >> ./boot/config.txt.bak
 sudo echo "hdmi_drive=2" >> ./boot/config.txt.bak
 sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
-if [ -f "$OVERLAYS_PATH/"goodix.dtbo ]; then
-sudo mv "$OVERLAYS_PATH/"goodix.dtbo "$OVERLAYS_PATH/"goodix.dtbo.bak
+if [ -f "$OVERLAYS_PATH/goodix.dtbo" ]; then
+sudo mv "$OVERLAYS_PATH/goodix.dtbo" "$OVERLAYS_PATH/goodix.dtbo.bak"
 sudo cp ./usr/goodix.dtbo "$OVERLAYS_PATH/" 
 fi
 
@@ -96,7 +96,7 @@ else
 echo "install cmake error!!!!"
 fi
 else
-echo "bad network, can't install cmake!!!"
+echo "bad network, cannot install cmake!!!"
 fi
 
 #evdev install

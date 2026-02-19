@@ -22,7 +22,7 @@ fi
 #sudo mkdir -p /etc/X11/xorg.conf.d
 #fi
 #sudo cp ./usr/mhs35-overlay.dtb "$OVERLAYS_PATH/"
-#sudo cp ./usr/mhs35-overlay.dtb "$OVERLAYS_PATH/"mhs35.dtbo
+#sudo cp ./usr/mhs35-overlay.dtb "$OVERLAYS_PATH/mhs35.dtbo"
 
 root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
 if test "$root_dev" = "/dev/mmcblk0p7";then

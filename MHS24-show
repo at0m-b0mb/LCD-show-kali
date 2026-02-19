@@ -16,7 +16,7 @@ echo "=========================================="
 sudo rm -rf /etc/X11/xorg.conf.d/40-libinput.conf
 sudo mkdir -p /etc/X11/xorg.conf.d
 sudo cp ./usr/mhs24-overlay.dtb "$OVERLAYS_PATH/"
-sudo cp ./usr/mhs24-overlay.dtb "$OVERLAYS_PATH/"mhs24.dtbo
+sudo cp ./usr/mhs24-overlay.dtb "$OVERLAYS_PATH/mhs24.dtbo"
 sudo cp -rf ./usr/99-calibration.conf-mhs24  /etc/X11/xorg.conf.d/99-calibration.conf
 sudo cp -rf ./usr/99-fbturbo-fbcp.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
 if [ -b /dev/mmcblk0p7 ]; then

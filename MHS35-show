@@ -96,7 +96,7 @@ else
 echo "install cmake error!!!!"
 fi
 else
-echo "bad network, can't install cmake!!!"
+echo "bad network, cannot install cmake!!!"
 fi
 
 #evdev install

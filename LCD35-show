@@ -22,8 +22,8 @@ if [ ! -d /etc/X11/xorg.conf.d ]; then
 sudo mkdir -p /etc/X11/xorg.conf.d
 fi
 sudo cp ./usr/tft35a-overlay.dtb "$OVERLAYS_PATH/"
-sudo cp ./usr/tft35a-overlay.dtb "$OVERLAYS_PATH/"tft35a.dtbo
-root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
+sudo cp ./usr/tft35a-overlay.dtb "$OVERLAYS_PATH/tft35a.dtbo"
+root_dev=`grep -oPr "root=[^\s]*" "$BOOT_PATH/cmdline.txt" 2>/dev/null | awk -F= '{printf $NF}'`
 if test "$root_dev" = "/dev/mmcblk0p7";then
 sudo cp -rf ./boot/config-noobs-nomal.txt ./boot/config.txt.bak
 else
@@ -90,7 +90,7 @@ else
 echo "install cmake error!!!!"
 fi
 else
-echo "bad network, can't install cmake!!!"
+echo "bad network, cannot install cmake!!!"
 fi
 
 #evdev install
