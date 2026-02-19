@@ -1,8 +1,22 @@
 #!/bin/bash
+# Source OS detection and common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
+# Print OS information
+SCRIPT_NAME=$(basename "$0")
+echo "=========================================="
+echo "$SCRIPT_NAME - LCD Installation"
+echo "=========================================="
+echo "Detected OS: $DETECTED_OS"
+echo "Boot Path: $BOOT_PATH"
+echo "Overlays Path: $OVERLAYS_PATH"
+echo "=========================================="
+
 sudo rm -rf /etc/X11/xorg.conf.d/40-libinput.conf
 sudo mkdir -p /etc/X11/xorg.conf.d
-sudo cp ./usr/mhs24-overlay.dtb /boot/overlays/
-sudo cp ./usr/mhs24-overlay.dtb /boot/overlays/mhs24.dtbo
+sudo cp ./usr/mhs24-overlay.dtb "$OVERLAYS_PATH/"
+sudo cp ./usr/mhs24-overlay.dtb "$OVERLAYS_PATH/"mhs24.dtbo
 sudo cp -rf ./usr/99-calibration.conf-mhs24  /etc/X11/xorg.conf.d/99-calibration.conf
 sudo cp -rf ./usr/99-fbturbo-fbcp.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
 if [ -b /dev/mmcblk0p7 ]; then

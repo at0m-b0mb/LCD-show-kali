@@ -1,4 +1,18 @@
 #!/bin/bash
+# Source OS detection and common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
+# Print OS information
+SCRIPT_NAME=$(basename "$0")
+echo "=========================================="
+echo "$SCRIPT_NAME - LCD Installation"
+echo "=========================================="
+echo "Detected OS: $DETECTED_OS"
+echo "Boot Path: $BOOT_PATH"
+echo "Overlays Path: $OVERLAYS_PATH"
+echo "=========================================="
+
 sudo ./system_backup.sh
 
 hw_version=`tr -d '\0' < /proc/device-tree/model`
@@ -23,7 +37,7 @@ sudo echo "hdmi_drive=2" >> ./boot/config.txt.bak
 sudo echo "hdmi_cvt 480 320 60 6 0 0 0" >> ./boot/config.txt.bak
 sudo echo "dtoverlay=ads7846,cs=1,penirq=25,penirq_pull=2,speed=50000,keep_vref_on=0,swapxy=0,pmax=255,xohms=150,xmin=200,xmax=3900,ymin=200,ymax=3900" >> ./boot/config.txt.bak
 [[ $hw_version =~ "Raspberry Pi 4" ]] && sudo echo "hdmi_timings=600 0 20 28 48 400 0 13 3 32 0 0 0 30 0 25000000 5" >> ./boot/config.txt.bak
-sudo cp -rf ./boot/config.txt.bak /boot/config.txt
+sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
 #sudo cp -rf ./boot/config-35-480X320.txt /boot/config.txt 
 #if test "$root_dev" = "/dev/mmcblk0p7";then
@@ -51,11 +65,16 @@ if test $version -lt 2017;then
 echo "reboot"
 else
 echo "need to update touch configuration"
-wget --spider -q -o /dev/null --tries=1 -T 10 http://mirrors.zju.edu.cn/raspbian/raspbian
-if [ $? -eq 0 ]; then
-sudo apt-get install xserver-xorg-input-evdev 2> error_output.txt
-else
+# Try installing from package manager first (works for Kali, Parrot, Raspbian, and other Debian-based systems)
+sudo apt-get update
+sudo apt-get install -y xserver-xorg-input-evdev 2> error_output.txt
+result=`cat ./error_output.txt`
+
+# If apt-get failed, try using the local .deb package
+if grep -q "error:\|E:" ./error_output.txt; then
+echo "Package manager install failed, trying local package..."
 sudo dpkg -i -B ./xserver-xorg-input-evdev_1%3a2.10.6-1+b1_armhf.deb 2> error_output.txt
+result=`cat ./error_output.txt`
 fi
 result=`cat ./error_output.txt`
 echo -e "\033[31m$result\033[0m"

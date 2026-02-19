@@ -1,4 +1,17 @@
 #!/bin/bash
+# Source OS detection and common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
+# Print OS information
+SCRIPT_NAME=$(basename "$0")
+echo "=========================================="
+echo "$SCRIPT_NAME - LCD Installation"
+echo "=========================================="
+echo "Detected OS: $DETECTED_OS"
+echo "Boot Path: $BOOT_PATH"
+echo "Overlays Path: $OVERLAYS_PATH"
+echo "=========================================="
 
 sudo ./system_backup.sh
 
@@ -20,7 +33,7 @@ sudo echo "hdmi_group=2" >> ./boot/config.txt.bak
 sudo echo "hdmi_mode=87" >> ./boot/config.txt.bak
 sudo echo "hdmi_drive=2" >> ./boot/config.txt.bak
 sudo echo "hdmi_cvt 1024 600 60 6 0 0 0" >> ./boot/config.txt.bak
-sudo cp -rf ./boot/config.txt.bak /boot/config.txt
+sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 #sudo cp -rf ./boot/config-7C-1024x600.txt /boot/config.txt
 #if test "$root_dev" = "/dev/mmcblk0p7";then
 #sudo cp ./usr/cmdline.txt-noobs /boot/cmdline.txt

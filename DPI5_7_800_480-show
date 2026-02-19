@@ -1,4 +1,17 @@
 #!/bin/bash
+# Source OS detection and common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
+# Print OS information
+SCRIPT_NAME=$(basename "$0")
+echo "=========================================="
+echo "$SCRIPT_NAME - LCD Installation"
+echo "=========================================="
+echo "Detected OS: $DETECTED_OS"
+echo "Boot Path: $BOOT_PATH"
+echo "Overlays Path: $OVERLAYS_PATH"
+echo "=========================================="
 
 sudo ./system_backup.sh
 
@@ -15,10 +28,10 @@ sudo echo "disable_overscan=1" >> ./boot/config.txt.bak
 sudo echo "dtoverlay=i2c5,pins_10_11" >> ./boot/config.txt.bak
 sudo echo "dtoverlay=goodix_dpi,interrupt=26,reset=18" >> ./boot/config.txt.bak
 #sudo echo "gpio=19=op,dh" >> ./boot/config.txt.bak
-sudo cp -rf ./boot/config.txt.bak /boot/config.txt
+sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
-sudo cp ./usr/qddpi18.dtb /boot/overlays/qddpi18.dtbo
-sudo cp ./usr/goodix_dpi.dtb /boot/overlays/goodix_dpi.dtbo
+sudo cp ./usr/qddpi18.dtb "$OVERLAYS_PATH/"qddpi18.dtbo
+sudo cp ./usr/goodix_dpi.dtb "$OVERLAYS_PATH/"goodix_dpi.dtbo
 
 sudo touch ./.have_installed
 #echo "hdmi:capacity:7C-1024x600:0:1024:600" > ./.have_installed

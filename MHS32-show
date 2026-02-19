@@ -1,4 +1,17 @@
 #!/bin/bash
+# Source OS detection and common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
+# Print OS information
+SCRIPT_NAME=$(basename "$0")
+echo "=========================================="
+echo "$SCRIPT_NAME - LCD Installation"
+echo "=========================================="
+echo "Detected OS: $DETECTED_OS"
+echo "Boot Path: $BOOT_PATH"
+echo "Overlays Path: $OVERLAYS_PATH"
+echo "=========================================="
 
 sudo ./system_backup.sh
 
@@ -8,8 +21,8 @@ fi
 if [ ! -d /etc/X11/xorg.conf.d ]; then
 sudo mkdir -p /etc/X11/xorg.conf.d
 fi
-sudo cp ./usr/mhs32-overlay.dtb /boot/overlays/
-sudo cp ./usr/mhs32-overlay.dtb /boot/overlays/mhs32.dtbo
+sudo cp ./usr/mhs32-overlay.dtb "$OVERLAYS_PATH/"
+sudo cp ./usr/mhs32-overlay.dtb "$OVERLAYS_PATH/"mhs32.dtbo
 root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
 if test "$root_dev" = "/dev/mmcblk0p7";then
 sudo cp -rf ./boot/config-noobs-nomal.txt ./boot/config.txt.bak
@@ -26,7 +39,7 @@ sudo echo "hdmi_mode=1" >> ./boot/config.txt.bak
 sudo echo "hdmi_mode=87" >> ./boot/config.txt.bak
 sudo echo "hdmi_cvt 320 240 60 6 0 0 0" >> ./boot/config.txt.bak
 sudo echo "hdmi_drive=2" >> ./boot/config.txt.bak
-sudo cp -rf ./boot/config.txt.bak /boot/config.txt
+sudo cp -rf ./boot/config.txt.bak "$BOOT_PATH/config.txt"
 
 sudo cp -rf ./usr/99-calibration.conf-mhs32-270  /etc/X11/xorg.conf.d/99-calibration.conf
 sudo cp -rf ./usr/99-fbturbo.conf  /usr/share/X11/xorg.conf.d/99-fbturbo.conf
@@ -91,11 +104,16 @@ if test $version -lt 2017;then
 echo "reboot"
 else
 echo "need to update touch configuration"
-wget --spider -q -o /dev/null --tries=1 -T 10 http://mirrors.zju.edu.cn/raspbian/raspbian
-if [ $? -eq 0 ]; then
-sudo apt-get install xserver-xorg-input-evdev 2> error_output.txt
-else
+# Try installing from package manager first (works for Kali, Parrot, Raspbian, and other Debian-based systems)
+sudo apt-get update
+sudo apt-get install -y xserver-xorg-input-evdev 2> error_output.txt
+result=`cat ./error_output.txt`
+
+# If apt-get failed, try using the local .deb package
+if grep -q "error:\|E:" ./error_output.txt; then
+echo "Package manager install failed, trying local package..."
 sudo dpkg -i -B ./xserver-xorg-input-evdev_1%3a2.10.6-1+b1_armhf.deb 2> error_output.txt
+result=`cat ./error_output.txt`
 fi
 result=`cat ./error_output.txt`
 echo -e "\033[31m$result\033[0m"
