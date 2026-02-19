@@ -1,4 +1,8 @@
 #!/bin/bash
+# Source OS detection to get dynamic boot paths
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/os-detect.sh"
+
 if [ ! -d "./.system_backup" ]; then
 sudo mkdir ./.system_backup
 fi
@@ -20,28 +24,32 @@ sudo mkdir -p ./.system_backup/xorg.conf.d
 sudo rm -rf /etc/X11/xorg.conf.d
 fi
 
-result=`grep -rn "^dtoverlay=" /boot/config.txt | grep ":rotate=" | tail -n 1`
+# Use dynamic boot path
+BOOT_CONFIG="$BOOT_PATH/config.txt"
+BOOT_CMDLINE="$BOOT_PATH/cmdline.txt"
+
+result=`grep -rn "^dtoverlay=" "$BOOT_CONFIG" 2>/dev/null | grep ":rotate=" | tail -n 1`
 if [ $? -eq 0 ]; then
 str=`echo -n $result | awk -F: '{printf $2}' | awk -F= '{printf $NF}'`
-if [ -f /boot/overlays/$str-overlay.dtb ]; then
-sudo cp -rf /boot/overlays/$str-overlay.dtb ./.system_backup
-sudo rm -rf /boot/overlays/$str-overlay.dtb
+if [ -f "$OVERLAYS_PATH/$str-overlay.dtb" ]; then
+sudo cp -rf "$OVERLAYS_PATH/$str-overlay.dtb" ./.system_backup
+sudo rm -rf "$OVERLAYS_PATH/$str-overlay.dtb"
 fi
-if [ -f /boot/overlays/$str.dtbo ]; then
-sudo cp -rf /boot/overlays/$str.dtbo ./.system_backup
-sudo rm -rf /boot/overlays/$str.dtbo
+if [ -f "$OVERLAYS_PATH/$str.dtbo" ]; then
+sudo cp -rf "$OVERLAYS_PATH/$str.dtbo" ./.system_backup
+sudo rm -rf "$OVERLAYS_PATH/$str.dtbo"
 fi
 fi
 
-root_dev=`grep -oPr "root=[^\s]*" /boot/cmdline.txt | awk -F= '{printf $NF}'`
-sudo cp -rf /boot/config.txt ./.system_backup
-sudo cp -rf /boot/cmdline.txt ./.system_backup/
+root_dev=`grep -oPr "root=[^\s]*" "$BOOT_CMDLINE" 2>/dev/null | awk -F= '{printf $NF}'`
+sudo cp -rf "$BOOT_CONFIG" ./.system_backup 2>/dev/null
+sudo cp -rf "$BOOT_CMDLINE" ./.system_backup/ 2>/dev/null
 if test "$root_dev" = "/dev/mmcblk0p7";then
-sudo cp -rf ./boot/config-noobs-nomal.txt /boot/config.txt
-#sudo cp -rf ./usr/cmdline.txt-noobs-original /boot/cmdline.txt
+sudo cp -rf ./boot/config-noobs-nomal.txt "$BOOT_CONFIG"
+#sudo cp -rf ./usr/cmdline.txt-noobs-original "$BOOT_CMDLINE"
 else
-sudo cp -rf ./boot/config-nomal.txt /boot/config.txt
-#sudo cp -rf ./usr/cmdline.txt-original /boot/cmdline.txt
+sudo cp -rf ./boot/config-nomal.txt "$BOOT_CONFIG"
+#sudo cp -rf ./usr/cmdline.txt-original "$BOOT_CMDLINE"
 fi
 if [ -f /usr/share/X11/xorg.conf.d/99-fbturbo.conf ]; then
 sudo cp -rf /usr/share/X11/xorg.conf.d/99-fbturbo.conf ./.system_backup/

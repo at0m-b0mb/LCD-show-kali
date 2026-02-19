@@ -1,0 +1,24 @@
+# Temporary files
+*.bak
+*_OLD.*
+error_output.txt
+.have_installed
+.system_backup/
+
+# Build artifacts
+rpi-fbcp/
+*.o
+*.so
+*.a
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
